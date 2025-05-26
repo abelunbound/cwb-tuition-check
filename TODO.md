@@ -1,88 +1,117 @@
-# Pending Tasks
+# CWB Tuition Check - Development Tasks
 
-## Security Improvements
+## Authentication & User Management
+### Sign Up Implementation
+- [ ] Create sign up modal triggered by "signup" link in login.py in components folder
+- [ ] Reuse existing functions from database.py design and implement new database table using database credittials in cwb-db.env for university sign ups with fields below in a new table 'enterprise_clients':
+  - org_id (unique identifier)
+  - enterprise_name
+  - first_name
+  - lastname_name
+  - group_email
+  - person_email
+  - phone
+  - password
+   - address_line1
+  - address_line2
+  - address_line3
+  - city
+  - postcode
+  - country
 
-### Database Connection Security
-- [ ] Remove hardcoded fallback credentials from `functions/database.py:get_db_connection()`
-- [ ] Add environment variable validation to ensure all required DB credentials are provided
-- [ ] Add `.env` files to `.gitignore` to prevent credential exposure
-- [ ] Rotate database credentials that were previously committed to version control
-- [ ] Consider implementing connection pooling for better resource management
+- [ ] Modify login system to authenticate against new sign up table database
+- [ ] The address fields in 'enterprise_clients' will be updated from a form in profile.py as part of verification/ completion after initial signup:
 
-### Environment Variables
-- [ ] Move `cwb-db.env` to project root as `.env`
-- [ ] Create `.env.example` template file for new developers
-- [ ] Document environment variable requirements in README.md
 
-## Code Improvements
-- [ ] Add error handling for missing environment variables
-- [ ] Add logging instead of print statements for database operations
-- [ ] Add connection timeout configuration
-- [ ] Consider implementing connection retry logic
 
-## Machine Learning Improvements
+## Home Page (home.py)
+### Financial Requirements Management
+- [ ] In the card for “Financial Requirements”, on click of the button “Create new”, implement modal for financial requirements with fields:
+  - course_name
+  - tuition_amount
+  - home_office_amount
+  - total_finance (derived from: tuition_amount + home_office_amount)
+  - session_year
+  - Requirement checkpoints:
+    - Home office living expense check
+    - Tuition check (yes/no)
+    - Exchange rate risks (yes/no)
+    - Basic balance check (yes/no)
+    - Probability of payment default forecast (yes/no)
+    - 
+- [ ] Reuse existing functions from database.py design and implement new database table for 'financial_requirements' with:
+  - org_id (foreign key to user account)
+  - unique_id for each requirement
+  - All form fields
+- [ ] Create a new card in in profile.py like the card for “Account Settings” there, display a DashTable with the requirements table but retrieve only requirements from database table for only logged in user org_id  
 
-### Model Evaluation and Metrics
-- [ ] Implement confidence interval calculations for forecasts
-- [ ] Add cross-validation for more robust performance estimates
-- [ ] Implement rolling-window evaluation for time series
-- [ ] Add error analysis by time horizon (7d, 14d, 30d patterns)
-- [ ] Add seasonality impact analysis on forecast accuracy
-- [ ] Implement anomaly detection in forecast errors
-- [ ] Add evaluation of prediction intervals coverage
+### Single Applicant Check
+- [ ] - In the card for “Single applicant check”, on click of "Perform check" launch page to collect form for  single applicant with:
+  - first_name
+  - last_name
+  - email
+  - Course dropdown (filtered by university account)
+  - Country field
+  - Generate unique 'applicant_id'
+  - Submit button
+  The course drop down should be the list of courses from the 'course_name' column in 'financial_requirements' table
+  for the logged-in 'org_id'.  
+- [ ] On click of submit, do three things 
+----- (1.) enter into a database table 'applicant_table' with credentials in cwb-db.env for the following fields					
+    - org_id	
+    - applicant_id	
+    - first_name	
+    - last_name	
+    - email	
+    - country	
+    - course
+----- (1a.) Redirect to Mono to collect json data, store the data in database
 
-### Experiment Tracking
-- [ ] Set up structured experiment logging with MLflow or Weights & Biases
-- [ ] Add automated hyperparameter logging
-- [ ] Implement experiment comparison visualization
-- [ ] Add model performance tracking over time
-- [ ] Create automated experiment reports
-- [ ] Add A/B testing framework for model comparison
+----- (2.) Send the 'applicant_id' and 'required_amount' value (obtain from the 'total_finance' field from 'financial_requirements' table) to the api 'https://us-central1-com-726-project.cloudfunctions.net/run-ml-model' using the json format data = {
+    'applicant_id': 912345678,
+    'required_amount': 14000
+}
+----- (3.) Redirect to a completion page with Thank you message, 
 
-### Metric Improvements
-- [ ] Add domain-specific financial metrics (e.g., Value at Risk)
-- [ ] Implement custom loss functions for financial forecasting
-- [ ] Add robustness metrics for extreme events
-- [ ] Implement feature importance tracking over time
-- [ ] Add model calibration metrics
-- [ ] Implement baseline model comparisons
 
-### Technical Debt
-- [ ] Refactor metric calculation for better modularity
-- [ ] Add type hints to evaluation functions
-- [ ] Improve error handling in hyperparameter parsing
-- [ ] Add validation for experiment configuration files
-- [ ] Create unified evaluation pipeline
-- [ ] Add automated metric threshold checking
+Integrate with backend verification system
+- [ ] Implement email link generation and sending
+- [ ] Set up Mono flow integration
+- [ ] On click of submit 
+  - Status update notification
+- [ ] Implement database storage for Mono JSON data
+- [ ] Set up API integration for affordability checks
+- [ ] Create new table entry system for applicant results
+- [ ] Implement view functionality linking to finhealth.py
 
-### Assessment and Decision Logic
-- [ ] Add configurable thresholds for confidence levels
-- [ ] Implement risk-adjusted affordability scoring
-- [ ] Add historical assessment accuracy tracking
-- [ ] Implement multi-factor assessment criteria
-- [ ] Add automated threshold optimization
-- [ ] Implement assessment confidence scoring
-- [ ] Add assessment decision explanations
+## Financial Health Page (finhealth.py)
+- [ ] Update data fetching logic to filter by applicant_id
+- [ ] Implement dynamic data loading based on selected applicant
 
-### Reporting Improvements
-- [ ] Add visualization of assessment results
-- [ ] Implement PDF report generation
-- [ ] Add historical assessment comparisons
-- [ ] Implement assessment audit trail
-- [ ] Add automated assessment notifications
-- [ ] Create assessment summary dashboard
+## Profile Page (profile.py)
+- [ ] Implement basic profile management
+- [ ] Add verification status display
+- [ ] Create requirements table view
+- [ ] Add functionality to complete address fields post-signup
 
-## Documentation
-- [ ] Add setup instructions for new developers
-- [ ] Document database schema and relationships
-- [ ] Add API documentation for database functions
-- [ ] Document machine learning model architecture and parameters
-- [ ] Add documentation for feature engineering process
-- [ ] Document model training and evaluation procedures
-- [ ] Add example notebooks for model usage
-- [ ] Document evaluation metrics and their interpretation
-- [ ] Add troubleshooting guide for common evaluation issues
-- [ ] Create model performance reporting templates
-- [ ] Document assessment criteria and thresholds
-- [ ] Add assessment result interpretation guide
-- [ ] Create assessment report templates 
+## Support Page (support.py)
+- [ ] Update FAQ content (Collaboration: Dami x Abel)
+
+## Database Schema Updates
+- [ ] Design and implement sign up table
+- [ ] Design and implement requirements table
+- [ ] Design and implement applicant results table
+
+## Integration Points
+- [ ] Connect signup flow with authentication system
+- [ ] Link requirements creation with database
+- [ ] Integrate Mono flow with applicant processing
+- [ ] Connect Google Cloud Function for affordability checks
+- [ ] Set up email notification system
+
+## Testing
+- [ ] Test signup flow
+- [ ] Test requirements creation and retrieval
+- [ ] Test applicant processing pipeline
+- [ ] Test financial health data display
+- [ ] Test profile management 

@@ -3,7 +3,7 @@ from dash import html, dcc
 import dash_bootstrap_components as dbc
 
 # Register the page
-dash.register_page(__name__, path="/support", title="Support | Ajo", name="Support")
+dash.register_page(__name__, path="/support", title="Support | GoodFaith", name="Support")
 
 # Page header component
 def create_page_header():
@@ -11,7 +11,7 @@ def create_page_header():
         className="dashboard-header",
         children=[
             html.H1("Support Center", className="dashboard-title"),
-            html.P("Get help with your Ajo account and groups.", className="dashboard-subtitle"),
+            html.P("Get help with your GoodFaith account and groups.", className="dashboard-subtitle"),
         ]
     )
 
@@ -33,36 +33,37 @@ def create_faq_section():
                         [
                             dbc.AccordionItem(
                                 [
-                                    html.P("Ajo is a community savings platform that helps you save money with friends, family, or colleagues in a structured and trusted way. It's based on the traditional rotating savings system popular in various cultures."),
+                                    html.P("GoodFaith is a community savings platform that helps you save money with friends, family, or colleagues in a structured and trusted way. It's based on the traditional rotating savings system popular in various cultures around the world."),
                                     html.P("Each member contributes a fixed amount regularly, and one member takes the entire pool on a rotating basis. This continues until all members have received the pool once."),
                                 ],
-                                title="What is Ajo and how does it work?",
+                                title="What is GoodFaith and how does it work?",
                             ),
                             dbc.AccordionItem(
                                 [
-                                    html.P("To create a new Ajo group:"),
-                                    html.Ol([
-                                        html.Li("Click on the '+ New Group' button on your dashboard"),
-                                        html.Li("Fill in the group details (name, contribution amount, frequency)"),
-                                        html.Li("Invite members via email"),
-                                        html.Li("Set the rotation schedule"),
-                                        html.Li("Confirm and create the group")
+                                    html.P("To create a new GoodFaith group:"),
+                                    html.Ul([
+                                        html.Li("Click the '+ New Group' button"),
+                                        html.Li("Fill in the group details"),
+                                        html.Li("Add members and their contribution amounts"),
+                                        html.Li("Set the payment schedule"),
+                                        html.Li("Review and create the group")
                                     ]),
                                     html.P("Once created, all invited members will receive an invitation to join."),
                                 ],
-                                title="How do I create a new Ajo group?",
+                                title="How do I create a new GoodFaith group?",
                             ),
                             dbc.AccordionItem(
                                 [
-                                    html.P("You can contribute to your Ajo groups through several payment methods:"),
+                                    html.P("You can contribute to your GoodFaith groups through several payment methods:"),
                                     html.Ul([
-                                        html.Li("Debit/Credit card"),
                                         html.Li("Bank transfer"),
-                                        html.Li("Standing order/Direct debit")
+                                        html.Li("Debit card"),
+                                        html.Li("Standing order"),
+                                        html.Li("Mobile money")
                                     ]),
                                     html.P("Set up automatic payments to ensure you never miss a contribution."),
                                 ],
-                                title="How do I make contributions to my group?",
+                                title="What payment methods are accepted?",
                             ),
                             dbc.AccordionItem(
                                 [
@@ -164,7 +165,7 @@ def create_contact_form():
                                     html.H4("Other Ways to Reach Us", className="mb-3"),
                                     html.Div([
                                         html.I(className="fas fa-envelope me-2"),
-                                        html.Span("Email: support@ajo-platform.com")
+                                        html.Span("Email: support@goodfaith-platform.com")
                                     ], className="mb-3"),
                                     html.Div([
                                         html.I(className="fas fa-phone me-2"),

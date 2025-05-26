@@ -296,3 +296,183 @@ def add_metadata_columns(df, applicant_id="123456789"):
     result_df['sn'] = range(1, len(result_df) + 1)
     
     return result_df
+
+def create_enterprise_clients_table():
+    """
+    Create the enterprise_clients table if it doesn't exist.
+    This table stores university signup information.
+    """
+    table_query = """
+    CREATE TABLE IF NOT EXISTS enterprise_clients (
+        org_id SERIAL PRIMARY KEY,
+        enterprise_name VARCHAR(255) NOT NULL,
+        first_name VARCHAR(255) NOT NULL,
+        last_name VARCHAR(255) NOT NULL,
+        group_email VARCHAR(255) NOT NULL,
+        person_email VARCHAR(255) NOT NULL UNIQUE,
+        phone VARCHAR(50),
+        password VARCHAR(255) NOT NULL,
+        address_line1 VARCHAR(255),
+        address_line2 VARCHAR(255),
+        address_line3 VARCHAR(255),
+        city VARCHAR(255),
+        postcode VARCHAR(50),
+        country VARCHAR(255),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """
+    
+    try:
+        connection = get_db_connection()
+        if not connection:
+            return False
+        
+        cursor = connection.cursor()
+        cursor.execute(table_query)
+        connection.commit()
+        print("Enterprise clients table created successfully")
+        return True
+        
+    except psycopg2.Error as error:
+        print(f"Error creating enterprise_clients table: {error}")
+        return False
+        
+    finally:
+        if "connection" in locals() and connection is not None:
+            cursor.close()
+            connection.close()
+
+def insert_enterprise_client(client_data):
+    """
+    Insert a new enterprise client into the database.
+    
+    Parameters:
+    client_data (dict): Dictionary containing client information with keys:
+        - enterprise_name
+        - first_name
+        - last_name
+        - group_email
+        - person_email
+        - phone
+        - password
+        - address_line1 (optional)
+        - address_line2 (optional)
+        - address_line3 (optional)
+        - city (optional)
+        - postcode (optional)
+        - country (optional)
+    
+    Returns:
+    tuple: (success, message, org_id)
+        - success (bool): Whether the insertion was successful
+        - message (str): Success or error message
+        - org_id (int): The ID of the inserted client if successful, None otherwise
+    """
+    insert_query = """
+    INSERT INTO enterprise_clients (
+        enterprise_name, first_name, last_name, group_email,
+        person_email, phone, password, address_line1, address_line2,
+        address_line3, city, postcode, country
+    ) VALUES (
+        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+    ) RETURNING org_id
+    """
+    
+    try:
+        connection = get_db_connection()
+        if not connection:
+            return False, "Database connection failed", None
+        
+        cursor = connection.cursor()
+        
+        # Prepare values tuple
+        values = (
+            client_data.get('enterprise_name'),
+            client_data.get('first_name'),
+            client_data.get('last_name'),
+            client_data.get('group_email'),
+            client_data.get('person_email'),
+            client_data.get('phone'),
+            client_data.get('password'),
+            client_data.get('address_line1'),
+            client_data.get('address_line2'),
+            client_data.get('address_line3'),
+            client_data.get('city'),
+            client_data.get('postcode'),
+            client_data.get('country')
+        )
+        
+        cursor.execute(insert_query, values)
+        org_id = cursor.fetchone()[0]
+        connection.commit()
+        
+        return True, "Enterprise client created successfully", org_id
+        
+    except psycopg2.IntegrityError as error:
+        if "person_email" in str(error):
+            return False, "Email already registered", None
+        return False, f"Database integrity error: {error}", None
+        
+    except psycopg2.Error as error:
+        return False, f"Database error: {error}", None
+        
+    finally:
+        if "connection" in locals() and connection is not None:
+            cursor.close()
+            connection.close()
+
+def get_enterprise_client_by_email(email):
+    """
+    Retrieve an enterprise client by their email address.
+    
+    Parameters:
+    email (str): The email address to search for
+    
+    Returns:
+    dict: Client information if found, None otherwise
+    """
+    query = """
+    SELECT org_id, enterprise_name, first_name, last_name, group_email,
+           person_email, phone, password, address_line1, address_line2,
+           address_line3, city, postcode, country
+    FROM enterprise_clients
+    WHERE person_email = %s
+    """
+    
+    try:
+        connection = get_db_connection()
+        if not connection:
+            return None
+        
+        cursor = connection.cursor()
+        cursor.execute(query, (email,))
+        result = cursor.fetchone()
+        
+        if result:
+            return {
+                'org_id': result[0],
+                'enterprise_name': result[1],
+                'first_name': result[2],
+                'last_name': result[3],
+                'group_email': result[4],
+                'person_email': result[5],
+                'phone': result[6],
+                'password': result[7],
+                'address_line1': result[8],
+                'address_line2': result[9],
+                'address_line3': result[10],
+                'city': result[11],
+                'postcode': result[12],
+                'country': result[13]
+            }
+        return None
+        
+    except psycopg2.Error as error:
+        print(f"Error retrieving enterprise client: {error}")
+        return None
+        
+    finally:
+        if "connection" in locals() and connection is not None:
+            cursor.close()
+            connection.close()

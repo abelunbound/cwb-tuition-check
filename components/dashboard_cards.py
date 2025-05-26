@@ -14,7 +14,7 @@ def create_dashboard_cards():
                         children=[
                             html.H3("Active Groups", className="card-title"),
                             html.Div("3", className="card-value"),
-                            html.Div("You're participating in 3 Ajo groups", className="card-subtitle"),
+                            html.Div("You're participating in 3 GoodFaith groups", className="card-subtitle"),
                         ]
                     )
                 ]
@@ -42,7 +42,7 @@ def create_dashboard_cards():
                         children=[
                             html.H3("Next Collection", className="card-title"),
                             html.Div("£5,000", className="card-value"),
-                            html.Div("Scotland Ajo by March 2025", className="card-subtitle"),
+                            html.Div("Scotland GoodFaith by March 2025", className="card-subtitle"),
                             html.Div(
                                 className="progress-container",
                                 children=[

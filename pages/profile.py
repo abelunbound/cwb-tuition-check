@@ -8,7 +8,7 @@ import dash_bootstrap_components as dbc
 dash.register_page(
     __name__, 
     path="/profile", 
-    title="Profile | Ajo", 
+    title="Profile | GoodFaith", 
     name="Profile"
 )
 
@@ -291,8 +291,7 @@ def layout():
             # First Row: Personal Information
             html.Div(className="mb-4", children=[create_personal_info_card()]),
             
-            # Second Row: Timeline Cards
-            html.Div(className="mb-4", children=[create_timeline_cards()]),
+            
             
             # Third Row: Account Settings
             html.Div(className="mb-4", children=[

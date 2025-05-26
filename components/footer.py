@@ -13,7 +13,7 @@ def create_footer():
                             html.Div(
                                 className="col-md-6",
                                 children=[
-                                    html.Div("© 2025 Ajo - Community Savings Platform. All rights reserved.")
+                                    html.Div("© 2025 GoodFaith - Community Savings Platform. All rights reserved.")
                                 ]
                             ),
                             html.Div(

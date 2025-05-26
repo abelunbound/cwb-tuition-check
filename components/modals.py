@@ -5,7 +5,7 @@ from dash import html
 def create_group_modal():
     return dbc.Modal(
         [
-            dbc.ModalHeader(html.H5("Create New Ajo Group", className="modal-title")),
+            dbc.ModalHeader(html.H5("Create New GoodFaith Group", className="modal-title")),
             dbc.ModalBody(
                 [
                     # Tabs
@@ -60,7 +60,7 @@ def create_group_modal():
                                         className="form-group mt-3",
                                         children=[
                                             html.Label("Group Description (Optional)"),
-                                            dbc.Textarea(placeholder="What's the purpose of this Ajo group?", rows=3),
+                                            dbc.Textarea(placeholder="What's the purpose of this GoodFaith group?", rows=3),
                                         ]
                                     ),
                                 ],
@@ -226,7 +226,7 @@ def create_success_modal():
                             ),
                             html.H3("Group Created Successfully!", className="success-title"),
                             html.P(
-                                "Your new Ajo group has been created. Invitations have been sent to all members.",
+                                "Your new GoodFaith group has been created. Invitations have been sent to all members.",
                                 className="success-message"
                             ),
                             dbc.Button("See Group Details", color="primary", className="me-2"),

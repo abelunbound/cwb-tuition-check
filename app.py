@@ -1,128 +1,3 @@
-# import dash
-# from dash import html, dcc
-# import dash_bootstrap_components as dbc
-
-
-# # Initialize the Dash app with multi-page support
-# app = dash.Dash(
-#     __name__,
-#     external_stylesheets=[
-#         dbc.themes.BOOTSTRAP,
-#         'https://use.fontawesome.com/releases/v5.15.1/css/all.css'
-#     ],
-#     suppress_callback_exceptions=True,
-#     use_pages=True,  # Enable pages
-#     meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}]
-# )
-
-# # Define colors for global use
-# colors = {
-#     'primary': '#5F2EEA',
-#     'primary-light': '#8A6EF3',
-#     'primary-dark': '#4A1FB8',
-#     'success': '#2ECC71',
-#     'success-light': '#4CD787',
-#     'warning': '#F7B731',
-#     'danger': '#E74C3C',
-#     'dark': '#333333',
-#     'text': '#545454',
-#     'light-gray': '#F5F5F5',
-#     'medium-gray': '#E0E0E0',
-#     'white': '#FFFFFF',
-# }
-
-# # Custom CSS for the app
-# app.index_string = '''
-# <!DOCTYPE html>
-# <html>
-#     <head>
-#         {%metas%}
-#         <title>Ajo - Community Savings Platform</title>
-#         {%favicon%}
-#         {%css%}
-#         <style>
-            
-#         </style>
-#     </head>
-#     <body>
-#         {%app_entry%}
-#         <footer>
-#             {%config%}
-#             {%scripts%}
-#             {%renderer%}
-#         </footer>
-#     </body>
-# </html>
-# '''
-
-# # Header Navigation component 
-# def create_header():
-#     return html.Header(
-#         className="header mb-4",
-#         children=[
-#             html.Div(
-#                 className="container",
-#                 children=[
-#                     html.Div(
-#                         className="d-flex justify-content-between align-items-center",
-#                         children=[
-#                             html.A("CWB", className="logo", href="/"),
-#                             html.Nav(
-#                                 className="d-none d-md-block",
-#                                 children=[
-#                                     html.Ul(
-#                                         className="nav",
-#                                         children=[
-#                                             html.Li(html.A("Dashboard", href="/", className="nav-link active")),
-#                                             html.Li(html.A("My Groups", href="/groups", className="nav-link")),
-#                                             html.Li(html.A("Payments", href="/payments", className="nav-link")),
-#                                             html.Li(html.A("Support", href="/support", className="nav-link")),
-#                                         ]
-#                                     )
-#                                 ]
-#                             ),
-#                             html.Div(
-#                                 className="d-flex",
-#                                 children=[
-#                                     dbc.Button("Profile", color="", className="btn-outline-primary me-2", href="/profile"),
-#                                     dbc.Button("+ Create Group", color="primary", className="d-none", id="create-group-btn"),
-#                                     dbc.Button("Logout", color="primary", className="", id="logout-test"),
-#                                 ]
-#                             )
-#                         ]
-#                     )
-#                 ]
-#             )
-#         ]
-#     )
-
-# # Main layout with page container
-# app.layout = html.Div([
-#     # Header/Navigation
-#     create_header(),
-    
-#     # Page content - this is where pages will be loaded
-#     html.Main(
-#         className="dashboard",
-#         children=[
-#             html.Div(
-#                 className="container",
-#                 children=[
-#                     # This is where the current page content will be rendered
-#                     dash.page_container
-#                 ]
-#             )
-#         ]
-#     )
-# ])
-
-
-
-# # For development
-# if __name__ == '__main__':
-#     app.run_server(debug=True, use_reloader=True)
-
-
 import dash
 from dash import html, dcc, callback
 import dash_bootstrap_components as dbc
@@ -132,6 +7,7 @@ import uuid
 
 # Import authentication components
 from components.login import create_login_layout
+from components.signup_callbacks import toggle_signup_modal
 from auth import USERS_DB, SESSION_TIMEOUT, validate_user
 
 
@@ -177,7 +53,7 @@ app.index_string = '''
 <html>
     <head>
         {%metas%}
-        <title>Ajo - Community Savings Platform</title>
+        <title>GoodFaith - Community Savings Platform</title>
         {%favicon%}
         {%css%}
         <style>
@@ -213,11 +89,8 @@ def create_header():
                                     html.Ul(
                                         className="nav",
                                         children=[
-                                            html.Li(html.A("Dashboard", href="/", className="nav-link active")),
-                                            html.Li(html.A("My Groups", href="/groups", className="nav-link")),
-                                            html.Li(html.A("Payments", href="/payments", className="nav-link")),
-                                            html.Li(html.A("Support", href="/support", className="nav-link")),
-                                            html.Li(html.A("FinHealth", href="/finhealth", className="nav-link")),
+                                            # html.Li(html.A("Support", href="/support", className="nav-link")),
+                                            # html.Li(html.A("FinHealth", href="/finhealth", className="nav-link")),
                                         ]
                                     )
                                 ]
@@ -225,8 +98,8 @@ def create_header():
                             html.Div(
                                 className="d-flex",
                                 children=[
-                                    dbc.Button("Profile", color="", className="btn-outline-primary me-2", href="/profile"),
-                                    dbc.Button("+ Create Group", color="primary", className="me-2", id="create-group-btn"),
+                                    dbc.Button("Demo University Profile", color="", className="btn-outline-primary me-2", href="/profile"),
+                                    dbc.Button("FAQ", color="primary", className="me-2", id="create-group-btn", href="/support"),
                                     dbc.Button("Logout", color="danger", className="", id="logout-btn"),
                                 ]
                             )
@@ -349,7 +222,7 @@ def display_page(pathname, session_data, error_data):
 # For development
 
 if __name__ == '__main__':
-    app.run_server(debug=True, use_reloader=False)
+    app.run_server(debug=True, use_reloader=True)
 else:
     # This branch is used by App Engine
     server = app.server

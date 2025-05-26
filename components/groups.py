@@ -16,7 +16,7 @@ def create_groups_section():
             html.Div(
                 className="section-header",
                 children=[
-                    html.H2("My Ajo Groups", className="section-title"),
+                    html.H2("My GoodFaith Groups", className="section-title"),
                     dbc.Button("+ New Group", color="primary", id="new-group-btn"),
                 ]
             ),
@@ -37,7 +37,7 @@ def create_groups_section():
                                             html.Div(
                                                 className="group-info",
                                                 children=[
-                                                    html.H3("Ogo Ajo Savings"),
+                                                    html.H3("Ogo GoodFaith Savings"),
                                                     html.Div(
                                                         className="members-count",
                                                         children=[user_icon, "8 members"]
@@ -115,7 +115,7 @@ def create_groups_section():
                                             html.Div(
                                                 className="group-info",
                                                 children=[
-                                                    html.H3("Yettie Ajo"),
+                                                    html.H3("Yettie GoodFaith"),
                                                     html.Div(
                                                         className="members-count",
                                                         children=[user_icon, "6 members"]
@@ -177,7 +177,7 @@ def create_groups_section():
                             )
                         ]
                     ),
-                    # Scotland Ajo Group Card
+                    # Scotland GoodFaith Group Card
                     html.Div(
                         className="col-lg-4 col-md-6 mb-4",
                         children=[
@@ -190,7 +190,7 @@ def create_groups_section():
                                             html.Div(
                                                 className="group-info",
                                                 children=[
-                                                    html.H3("Scotland Ajo"),
+                                                    html.H3("Scotland GoodFaith"),
                                                     html.Div(
                                                         className="members-count",
                                                         children=[user_icon, "10 members"]
@@ -262,7 +262,7 @@ def create_groups_section():
                                 id="create-group-card",
                                 children=[
                                     plus_icon,
-                                    html.Span("Create New Ajo Group", className="create-group-text mt-2"),
+                                    html.Span("Create New GoodFaith Group", className="create-group-text mt-2"),
                                 ]
                             )
                         ]

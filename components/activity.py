@@ -96,7 +96,7 @@ def create_activity_section():
                                         className="activity-text",
                                         children=[
                                             html.Strong("You created"),
-                                            " a new Ajo group"
+                                            " a new GoodFaith group"
                                         ]
                                     ),
                                     html.Div("01 Feb, 9:15 AM", className="activity-time"),

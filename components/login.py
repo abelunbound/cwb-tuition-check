@@ -1,5 +1,6 @@
 from dash import html
 import dash_bootstrap_components as dbc
+from components.signup_modal import create_signup_modal
 
 def create_login_layout(error_message=""):
     """Create the login page layout"""
@@ -8,7 +9,7 @@ def create_login_layout(error_message=""):
             dbc.Col([
                 html.Br(),
                 html.Br(),
-                html.H2("Credit Without Borders - Ajo Platform", className="text-center"),
+                html.H2("Credit Without Borders - GoodFaith Platform", className="text-center"),
                 html.P("Sign in to access your account", className="text-center text-muted"),
                 html.Br(),
             ], width={"size": 6, "offset": 3})
@@ -49,7 +50,7 @@ def create_login_layout(error_message=""):
                         html.Hr(),
                         html.P([
                             "Don't have an account? ",
-                            html.A("Sign up", href="#"),
+                            html.A("Sign up", href="#", id="signup-link"),
                         ], className="text-center"),
                         html.Div([
                             html.P("Demo Credentials:", className="font-weight-bold mt-3 mb-1 text-center"),
@@ -60,4 +61,5 @@ def create_login_layout(error_message=""):
                 ], className="shadow-sm")
             ], width={"size": 6, "offset": 3})
         ]),
+        create_signup_modal(),
     ], fluid=True, className="py-5 bg-light")

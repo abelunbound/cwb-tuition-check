@@ -4,6 +4,7 @@ import numpy as np
 from dotenv import load_dotenv
 import os
 from pathlib import Path
+import bcrypt
 np.bool = np.bool_ # https://stackoverflow.com/questions/74893742/how-to-solve-attributeerror-module-numpy-has-no-attribute-bool
 
 # Load environment variables from the functions directory
@@ -343,6 +344,47 @@ def create_enterprise_clients_table():
             cursor.close()
             connection.close()
 
+def hash_password(password: str) -> str:
+    """
+    Hash a password using bcrypt.
+    
+    Parameters:
+    password (str): The plain text password to hash
+    
+    Returns:
+    str: The hashed password as a string
+    """
+    # Convert the password to bytes
+    password_bytes = password.encode('utf-8')
+    # Generate a salt and hash the password
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password_bytes, salt)
+    # Convert bytes to string for storage
+    return hashed.decode('utf-8')
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """
+    Verify a password against its hash.
+    
+    Parameters:
+    plain_password (str): The password to verify
+    hashed_password (str): The hashed password to check against (as string)
+    
+    Returns:
+    bool: True if the password matches, False otherwise
+    """
+    try:
+        # Convert string hash back to bytes
+        hashed_bytes = hashed_password.encode('utf-8')
+        # Convert plain password to bytes and verify
+        return bcrypt.checkpw(
+            plain_password.encode('utf-8'),
+            hashed_bytes
+        )
+    except Exception as e:
+        print(f"Password verification error: {e}")
+        return False
+
 def insert_enterprise_client(client_data):
     """
     Insert a new enterprise client into the database.
@@ -386,7 +428,10 @@ def insert_enterprise_client(client_data):
         
         cursor = connection.cursor()
         
-        # Prepare values tuple
+        # Hash the password before storing
+        hashed_password = hash_password(client_data['password'])
+        
+        # Prepare values tuple with hashed password
         values = (
             client_data.get('enterprise_name'),
             client_data.get('first_name'),
@@ -394,7 +439,7 @@ def insert_enterprise_client(client_data):
             client_data.get('group_email'),
             client_data.get('person_email'),
             client_data.get('phone'),
-            client_data.get('password'),
+            hashed_password,  # Store the hashed password
             client_data.get('address_line1'),
             client_data.get('address_line2'),
             client_data.get('address_line3'),
@@ -422,12 +467,13 @@ def insert_enterprise_client(client_data):
             cursor.close()
             connection.close()
 
-def get_enterprise_client_by_email(email):
+def get_enterprise_client_by_email(email, include_password=False):
     """
     Retrieve an enterprise client by their email address.
     
     Parameters:
     email (str): The email address to search for
+    include_password (bool): Whether to include the hashed password in the result
     
     Returns:
     dict: Client information if found, None otherwise
@@ -450,7 +496,7 @@ def get_enterprise_client_by_email(email):
         result = cursor.fetchone()
         
         if result:
-            return {
+            client_data = {
                 'org_id': result[0],
                 'enterprise_name': result[1],
                 'first_name': result[2],
@@ -458,7 +504,6 @@ def get_enterprise_client_by_email(email):
                 'group_email': result[4],
                 'person_email': result[5],
                 'phone': result[6],
-                'password': result[7],
                 'address_line1': result[8],
                 'address_line2': result[9],
                 'address_line3': result[10],
@@ -466,6 +511,9 @@ def get_enterprise_client_by_email(email):
                 'postcode': result[12],
                 'country': result[13]
             }
+            if include_password:
+                client_data['password'] = result[7]
+            return client_data
         return None
         
     except psycopg2.Error as error:
@@ -476,3 +524,35 @@ def get_enterprise_client_by_email(email):
         if "connection" in locals() and connection is not None:
             cursor.close()
             connection.close()
+
+def verify_enterprise_client(email: str, password: str) -> tuple[bool, str, dict]:
+    """
+    Verify an enterprise client's credentials.
+    
+    Parameters:
+    email (str): The client's email address
+    password (str): The plain text password to verify
+    
+    Returns:
+    tuple: (success, message, client_data)
+        - success (bool): Whether the verification was successful
+        - message (str): Success or error message
+        - client_data (dict): Client information if successful, None otherwise
+    """
+    try:
+        # Get client data including password
+        client_data = get_enterprise_client_by_email(email, include_password=True)
+        
+        if not client_data:
+            return False, "Invalid email or password", None
+            
+        # Verify the password
+        if not verify_password(password, client_data['password']):
+            return False, "Invalid email or password", None
+            
+        # Remove password from client data before returning
+        del client_data['password']
+        return True, "Authentication successful", client_data
+        
+    except Exception as error:
+        return False, f"Authentication error: {str(error)}", None

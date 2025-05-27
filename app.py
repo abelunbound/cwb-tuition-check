@@ -81,7 +81,7 @@ def create_header():
                     html.Div(
                         className="d-flex justify-content-between align-items-center",
                         children=[
-                            html.A("CWB", className="logo", href="/"),
+                            html.A("GoodFaith", className="logo", href="/"),
                             html.Nav(
                                 className="d-none d-md-block",
                                 children=[
@@ -97,8 +97,8 @@ def create_header():
                             html.Div(
                                 className="d-flex",
                                 children=[
+                                    dbc.Button("FAQ", color="", className="btn-outline-primary me-2", id="create-group-btn", href="/support"),
                                     dbc.Button("Demo University Profile", color="", className="btn-outline-primary me-2", href="/profile"),
-                                    dbc.Button("FAQ", color="primary", className="me-2", id="create-group-btn", href="/support"),
                                     dbc.Button("Logout", color="danger", className="", id="logout-btn"),
                                 ]
                             )

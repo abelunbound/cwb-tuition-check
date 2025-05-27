@@ -440,11 +440,14 @@ def create_exchange_rate_volatility_card():
 # Change from static layout to function-based layout
 def layout():
     return html.Div([
-        # Page Header
-        create_page_header(),
+        
         
         # Container for all profile sections
         dbc.Container([
+
+            # Page Header
+            create_page_header(),
+            
             # First Row: Personal Information
             html.Div(className="mb-4", children=[ create_personal_data_card()]),
             

@@ -32,10 +32,10 @@ def create_page_header():
             html.H1("Welcome!", className="dashboard-title"),
             html.P("""Here your university staff or agents can verify the 
                    financial capabilities of international
-                    applicants for your BSc and MSc programs 
-                   from over 30+ countries within minutes using our open banking capabilities. 
-                   Our advanced machine learning capabilities
-                   let you forecast risks of tuition payment default.""", 
+                    applicants for your BSc and MSc programs within minutes using our 
+                   open banking capabilities with access to 2,000+ banks across 30 countries. 
+                   Our advanced analytics capabilities let you forsee risks to your international tuition revenue 
+                   based on personalised applicant assessments.""", 
                    className="dashboard-subtitle"
                    ),
         ]
@@ -229,7 +229,34 @@ def create_account_settings_card():
 
     return dbc.Card(
         dbc.CardBody([
-            html.H5("Applicants financial profiles", className="card-title mb-3"),
+            # Header with title and filters
+            dbc.Row([
+                dbc.Col([
+                    html.H5("Applicants financial profiles", className="card-title mb-3")
+                ], width=6),
+                dbc.Col([
+                    dbc.Row([
+                        dbc.Col([
+                            # dbc.Label("Country", className="form-label small"),
+                            dcc.Dropdown(
+                                id='country-filter',
+                                placeholder="All Countries",
+                                clearable=True,
+                                style={'fontSize': '14px'}
+                            )
+                        ], width=6),
+                        dbc.Col([
+                            # dbc.Label("Course", className="form-label small"),
+                            dcc.Dropdown(
+                                id='course-filter',
+                                placeholder="All Courses",
+                                clearable=True,
+                                style={'fontSize': '14px'}
+                            )
+                        ], width=6)
+                    ])
+                ], width=6)
+            ], className="mb-3"),
             html.Div([
                 # Store for current applicant ID
                 dcc.Store(id='current-applicant-id'),
@@ -439,12 +466,12 @@ def create_financial_requirements_modal():
                                     ),
                                 ]),
                             ]),
-                            html.H6("Requirement Checkpoints", className="mt-3 mb-2"),
+                            html.H6("Affordability Checkpoints", className="mt-3 mb-2"),
                             dbc.Checklist(
                                 options=[
                                     {"label": "Home office living expense check", "value": "home_office_check"},
                                     {"label": "Tuition check", "value": "tuition_check"},
-                                    {"label": "Exchange rate risks", "value": "exchange_rate_risks"},
+                                    {"label": "Exchange rate volatility risks", "value": "exchange_rate_risks"},
                                     {"label": "Basic balance check", "value": "basic_balance_check"},
                                     {"label": "Probability of payment default forecast", "value": "payment_default_forecast"},
                                 ],
@@ -627,7 +654,11 @@ def create_batch_check_modal():
                 html.Div(
                     id="batch-form-content",
                     children=[
-                        html.P("Please upload the excel file with name, course, email, country, application_date, for applicants for whom you want to conduct checks. Once you click on 'start check', an email will be sent to the applicants with a link to commence their checks.", 
+                        html.P("""Please upload the excel file with name, course, email, country, application_date, 
+                               for applicants for whom you want to conduct checks. Once you click on 'start check', 
+                               an email will be sent to the applicants with a link to commence their checks. The 
+                               'Start' and 'End' dates set duration each applicant has to complete the check before
+                               the link emailed to them expires. """, 
                                className="mb-4"),
                         dbc.Form([
                             dbc.Row([
@@ -862,17 +893,99 @@ def reset_batch_modal(n_clicks):
         )
     return dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update, dash.no_update
 
-# Callback to refresh applicants table data
+# Callback to populate filter dropdown options
 @callback(
-    Output('applicants-table', 'data'),
     [
-        Input('url', 'pathname'),
-        Input('batch-start', 'n_clicks')
+        Output('country-filter', 'options'),
+        Output('course-filter', 'options')
     ],
+    Input('url', 'pathname'),
     prevent_initial_call=False
 )
-def refresh_applicants_table(pathname, batch_clicks):
-    """Refresh applicants table data from database"""
+def populate_filter_options(pathname):
+    """Populate dropdown options from database"""
+    try:
+        from functions.database import retrieve_data_from_sql
+        df = retrieve_data_from_sql('applicant_table')
+        
+        if df is not None and len(df) > 0:
+            # Get unique countries and courses
+            countries = sorted(df['country'].dropna().unique())
+            courses = sorted(df['course'].dropna().unique())
+            
+            country_options = [{'label': country, 'value': country} for country in countries]
+            course_options = [{'label': course, 'value': course} for course in courses]
+            
+            return country_options, course_options
+        else:
+            return [], []
+    except Exception as e:
+        print(f"Error populating filter options: {e}")
+        return [], []
+
+# Updated callback to refresh applicants table data with filtering
+@callback(
+    Output('applicants-table', 'data', allow_duplicate=True),
+    [
+        Input('url', 'pathname'),
+        Input('batch-start', 'n_clicks'),
+        Input('country-filter', 'value'),
+        Input('course-filter', 'value')
+    ],
+    prevent_initial_call=True
+)
+def refresh_and_filter_applicants_table(pathname, batch_clicks, country_filter, course_filter):
+    """Refresh and filter applicants table data from database"""
+    try:
+        from functions.database import retrieve_data_from_sql
+        df = retrieve_data_from_sql('applicant_table')
+        
+        if df is not None and len(df) > 0:
+            # Apply filters
+            if country_filter:
+                df = df[df['country'] == country_filter]
+            if course_filter:
+                df = df[df['course'] == course_filter]
+            
+            # Convert DataFrame to list of dictionaries for the table
+            data = []
+            for _, row in df.iterrows():
+                # Format status with icons
+                status = row['check_status']
+                if status == 'pending':
+                    status_display = '⚠️ Pending'
+                elif status == 'completed':
+                    status_display = '✅ Completed'
+                elif status == 'expired':
+                    status_display = '❌ Expired'
+                else:
+                    status_display = status
+                
+                data.append({
+                    'applicant_id': row['applicant_id'],
+                    'name': row['name'],
+                    'email': row['email'],
+                    'course': row['course'],
+                    'country': row['country'],
+                    'date_applied': str(row['application_date']) if row['application_date'] else '',
+                    'status': status_display,
+                    'actions': 'View'
+                })
+            return data
+        else:
+            return []
+    except Exception as e:
+        print(f"Error fetching and filtering applicant data: {e}")
+        return []
+
+# Initial data load callback
+@callback(
+    Output('applicants-table', 'data'),
+    Input('url', 'pathname'),
+    prevent_initial_call=False
+)
+def initial_load_applicants_table(pathname):
+    """Initial load of applicants table data"""
     try:
         from functions.database import retrieve_data_from_sql
         df = retrieve_data_from_sql('applicant_table')
@@ -906,18 +1019,16 @@ def refresh_applicants_table(pathname, batch_clicks):
         else:
             return []
     except Exception as e:
-        print(f"Error fetching applicant data: {e}")
+        print(f"Error fetching initial applicant data: {e}")
         return []
 
 # Change from static layout to function-based layout
 def layout():
     return html.Div([
-        # Page Header
-        create_page_header(),
-        
         # Container for all profile sections
         dbc.Container([
-
+            # Page Header
+            create_page_header(),
             
             # Second Row: Timeline Cards
             html.Div(className="mb-4", children=[create_timeline_cards()]),

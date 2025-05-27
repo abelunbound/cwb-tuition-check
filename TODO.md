@@ -26,7 +26,7 @@
 
 ## Home Page (home.py)
 ### Financial Requirements Management
-- [ ] In the card for “Financial Requirements”, on click of the button “Create new”, implement modal for financial requirements with fields:
+- [ ] In the card for “Financial Requirements”, on click of the button “Create new”, implement a modal for financial requirements with fields:
   - course_name
   - tuition_amount
   - home_office_amount
@@ -43,7 +43,8 @@
   - org_id (foreign key to user account)
   - unique_id for each requirement
   - All form fields
-- [ ] Create a new card in in profile.py like the card for “Account Settings” there, display a DashTable with the requirements table but retrieve only requirements from database table for only logged in user org_id  
+- [ ] Implement a callback to get form dataa insert data into table
+ 
 
 ### Single Applicant Check
 - [ ] - In the card for “Single applicant check”, on click of "Perform check" launch page to collect form for  single applicant with:
@@ -73,6 +74,17 @@
 }
 ----- (3.) Redirect to a completion page with Thank you message, 
 
+- [ ] In the card for “Batch applicant check" in home.py, on click of the button "Batch check”, implement a modal with a form with fields for:
+- start date
+- end date
+- upload button
+- start button
+The form should have instructions saying "Please upload the excel file with name, course, email, country, application_date, for applicants for whom you want to conduct checks. Once you click on “start check”, an email will be sent to the applicants with an ink to commence their checks." 
+
+Note: Upload button should accept only .csv file with the following columns (name, course, email, country, application_date). On click of "start button" in the form, insert file content into a database table 'applicant_table' using existing or new functions in database.py. The table should have (applicant_id, name, course, email, country, application_date, start_date, end_date, check_status). The start_date and end_date should be obtained from These table fields should never be empty (applicant_id, name, course, email, country). applicant_id should be unique 9 digit starting with 'ap086xxxxx' where first entry should be given 'ap08600001' next 'ap08600002' etc
+
+...note this should trigger an email to be sent (call an api from Biyi?)
+
 
 Integrate with backend verification system
 - [ ] Implement email link generation and sending
@@ -93,6 +105,7 @@ Integrate with backend verification system
 - [ ] Add verification status display
 - [ ] Create requirements table view
 - [ ] Add functionality to complete address fields post-signup
+- [ ] Create a new card in in profile.py like the card for “Account Settings” there, display a DashTable with the requirements table but retrieve only requirements from database table for only logged in user org_id 
 
 ## Support Page (support.py)
 - [ ] Update FAQ content (Collaboration: Dami x Abel)

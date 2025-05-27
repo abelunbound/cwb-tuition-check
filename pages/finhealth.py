@@ -53,8 +53,8 @@ def create_page_header():
     return html.Div(
         className="dashboard-header",
         children=[
-            html.H1("Financial Health Overview", className="dashboard-title"),
-            html.P("View assessment of each applicants tution affordability", className="dashboard-subtitle"),
+            html.H1("Affordability Assessment", className="dashboard-title"),
+            html.P("Protect your university's revenues. Ensure your international student applicants can afford to pay their tuition when due", className="dashboard-subtitle"),
         ]
     )
 
@@ -115,6 +115,7 @@ def create_personal_data_card():
             # Edit button
             dbc.Button(
                 "\u21A9 Back - other applicants", 
+                href="/",
                 color="primary", 
                 className="mt-3"
                 )

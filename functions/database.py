@@ -556,3 +556,254 @@ def verify_enterprise_client(email: str, password: str) -> tuple[bool, str, dict
         
     except Exception as error:
         return False, f"Authentication error: {str(error)}", None
+
+def create_financial_requirements_table():
+    """
+    Create the financial_requirements table if it doesn't exist.
+    This table stores financial requirements for courses.
+    """
+    table_query = """
+    CREATE TABLE IF NOT EXISTS financial_requirements (
+        requirement_id SERIAL PRIMARY KEY,
+        org_id INTEGER NOT NULL REFERENCES enterprise_clients(org_id),
+        course_name VARCHAR(255) NOT NULL,
+        tuition_amount DECIMAL(10,2) NOT NULL,
+        home_office_amount DECIMAL(10,2) NOT NULL,
+        total_finance DECIMAL(10,2) NOT NULL,
+        session_year VARCHAR(50) NOT NULL,
+        home_office_check BOOLEAN DEFAULT FALSE,
+        tuition_check BOOLEAN DEFAULT FALSE,
+        exchange_rate_risks BOOLEAN DEFAULT FALSE,
+        basic_balance_check BOOLEAN DEFAULT FALSE,
+        payment_default_forecast BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """
+    
+    try:
+        connection = get_db_connection()
+        if not connection:
+            return False
+        
+        cursor = connection.cursor()
+        cursor.execute(table_query)
+        connection.commit()
+        print("Financial requirements table created successfully")
+        return True
+        
+    except psycopg2.Error as error:
+        print(f"Error creating financial_requirements table: {error}")
+        return False
+        
+    finally:
+        if "connection" in locals() and connection is not None:
+            cursor.close()
+            connection.close()
+
+def insert_financial_requirement(requirement_data):
+    """
+    Insert a new financial requirement into the database.
+    
+    Parameters:
+    requirement_data (dict): Dictionary containing requirement information
+    
+    Returns:
+    tuple: (success, message, requirement_id)
+    """
+    insert_query = """
+    INSERT INTO financial_requirements (
+        org_id, course_name, tuition_amount, home_office_amount, total_finance,
+        session_year, home_office_check, tuition_check, exchange_rate_risks,
+        basic_balance_check, payment_default_forecast
+    ) VALUES (
+        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+    ) RETURNING requirement_id
+    """
+    
+    try:
+        connection = get_db_connection()
+        if not connection:
+            return False, "Database connection failed", None
+        
+        cursor = connection.cursor()
+        
+        values = (
+            requirement_data.get('org_id'),
+            requirement_data.get('course_name'),
+            requirement_data.get('tuition_amount'),
+            requirement_data.get('home_office_amount'),
+            requirement_data.get('total_finance'),
+            requirement_data.get('session_year'),
+            requirement_data.get('home_office_check', False),
+            requirement_data.get('tuition_check', False),
+            requirement_data.get('exchange_rate_risks', False),
+            requirement_data.get('basic_balance_check', False),
+            requirement_data.get('payment_default_forecast', False)
+        )
+        
+        cursor.execute(insert_query, values)
+        requirement_id = cursor.fetchone()[0]
+        connection.commit()
+        
+        return True, "Financial requirement created successfully", requirement_id
+        
+    except psycopg2.Error as error:
+        return False, f"Database error: {error}", None
+        
+    finally:
+        if "connection" in locals() and connection is not None:
+            cursor.close()
+            connection.close()
+
+def create_applicant_table():
+    """
+    Create the applicant_table if it doesn't exist.
+    This table stores batch applicant check information.
+    """
+    table_query = """
+    CREATE TABLE IF NOT EXISTS applicant_table (
+        applicant_id VARCHAR(20) PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        course VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        country VARCHAR(255) NOT NULL,
+        application_date DATE,
+        start_date DATE,
+        end_date DATE,
+        check_status VARCHAR(50) DEFAULT 'pending'
+    )
+    """
+    
+    try:
+        connection = get_db_connection()
+        if not connection:
+            return False
+        
+        cursor = connection.cursor()
+        cursor.execute(table_query)
+        connection.commit()
+        print("Applicant table created successfully")
+        return True
+        
+    except psycopg2.Error as error:
+        print(f"Error creating applicant_table: {error}")
+        return False
+        
+    finally:
+        if "connection" in locals() and connection is not None:
+            cursor.close()
+            connection.close()
+
+def get_next_applicant_id():
+    """
+    Get the next available applicant ID in format ap086xxxxx
+    """
+    query = """
+    SELECT applicant_id FROM applicant_table 
+    WHERE applicant_id LIKE 'ap086%' 
+    ORDER BY applicant_id DESC 
+    LIMIT 1
+    """
+    
+    try:
+        connection = get_db_connection()
+        if not connection:
+            return "ap08600001"  # Default first ID
+        
+        cursor = connection.cursor()
+        cursor.execute(query)
+        result = cursor.fetchone()
+        
+        if result:
+            last_id = result[0]
+            # Extract number part and increment
+            number_part = int(last_id[5:])  # Remove 'ap086' prefix
+            next_number = number_part + 1
+            return f"ap086{next_number:05d}"
+        else:
+            return "ap08600001"  # First ID
+            
+    except psycopg2.Error as error:
+        print(f"Error getting next applicant ID: {error}")
+        return "ap08600001"
+        
+    finally:
+        if "connection" in locals() and connection is not None:
+            cursor.close()
+            connection.close()
+
+def insert_batch_applicants(applicants_data, start_date, end_date):
+    """
+    Insert batch applicants into the database.
+    
+    Parameters:
+    applicants_data (list): List of dictionaries containing applicant information
+    start_date (str): Start date for the batch check
+    end_date (str): End date for the batch check
+    
+    Returns:
+    tuple: (success, message, inserted_count)
+    """
+    insert_query = """
+    INSERT INTO applicant_table (
+        applicant_id, name, course, email, country, application_date, start_date, end_date, check_status
+    ) VALUES (
+        %s, %s, %s, %s, %s, %s, %s, %s, %s
+    )
+    """
+    
+    try:
+        connection = get_db_connection()
+        if not connection:
+            return False, "Database connection failed", 0
+        
+        cursor = connection.cursor()
+        
+        # Get the starting ID once at the beginning
+        cursor.execute("""
+            SELECT applicant_id FROM applicant_table 
+            WHERE applicant_id LIKE 'ap086%' 
+            ORDER BY applicant_id DESC 
+            LIMIT 1
+        """)
+        result = cursor.fetchone()
+        
+        if result:
+            last_id = result[0]
+            next_number = int(last_id[5:]) + 1  # Remove 'ap086' prefix and increment
+        else:
+            next_number = 1  # First ID
+        
+        inserted_count = 0
+        
+        for applicant in applicants_data:
+            # Generate ID for this applicant
+            applicant_id = f"ap086{next_number:05d}"
+            
+            values = (
+                applicant_id,
+                applicant.get('name'),
+                applicant.get('course'),
+                applicant.get('email'),
+                applicant.get('country'),
+                applicant.get('application_date'),
+                start_date,
+                end_date,
+                'pending'
+            )
+            
+            cursor.execute(insert_query, values)
+            inserted_count += 1
+            next_number += 1  # Increment for next applicant
+        
+        connection.commit()
+        return True, f"Successfully inserted {inserted_count} applicants", inserted_count
+        
+    except psycopg2.Error as error:
+        return False, f"Database error: {error}", 0
+        
+    finally:
+        if "connection" in locals() and connection is not None:
+            cursor.close()
+            connection.close()

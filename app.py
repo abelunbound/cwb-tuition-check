@@ -1,3 +1,6 @@
+import sys
+print(f"Python interpreter being used: {sys.executable}")
+
 import dash
 from dash import html, dcc, callback
 import dash_bootstrap_components as dbc
@@ -7,16 +10,12 @@ import uuid
 
 # Import authentication components
 from components.login import create_login_layout
+from auth import SESSION_TIMEOUT, validate_user
+
+# Import other components
 from components.signup_callbacks import toggle_signup_modal
-from auth import USERS_DB, SESSION_TIMEOUT, validate_user
+from components.graph import create_timeline_fig
 
-
-from components.graph import (
-    create_timeline_fig
-)
-
-
-# 
 # Initialize the Dash app with multi-page support
 app = dash.Dash(
     __name__,
@@ -29,7 +28,6 @@ app = dash.Dash(
     meta_tags=[{"name": "viewport", "content": "width=device-width, initial-scale=1"}]
 )
 server = app.server  # Expose the Flask server
-
 
 # Define colors for global use
 colors = {

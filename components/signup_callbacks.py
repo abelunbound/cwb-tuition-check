@@ -78,7 +78,7 @@ def handle_signup_submit(n_clicks, enterprise_name, first_name, last_name, group
             "group_email": group_email,
             "person_email": person_email,
             "phone": phone,
-            "password": hash_password(password)
+            "password": password  # Pass plain password, let insert_enterprise_client handle hashing
         }
 
         # Insert the new client

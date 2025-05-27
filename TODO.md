@@ -33,13 +33,13 @@
   - total_finance (derived from: tuition_amount + home_office_amount)
   - session_year
   - Requirement checkpoints:
-    - Home office living expense check
+    - Home office living expense check (yes/no)
     - Tuition check (yes/no)
     - Exchange rate risks (yes/no)
     - Basic balance check (yes/no)
     - Probability of payment default forecast (yes/no)
     - 
-- [ ] Reuse existing functions from database.py design and implement new database table for 'financial_requirements' with:
+- [ ] Reuse existing functions from database.py design where possible and implement new database table for 'financial_requirements' with:
   - org_id (foreign key to user account)
   - unique_id for each requirement
   - All form fields

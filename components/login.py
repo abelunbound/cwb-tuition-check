@@ -9,7 +9,7 @@ def create_login_layout(error_message=""):
             dbc.Col([
                 html.Br(),
                 html.Br(),
-                html.H2("Credit Without Borders - GoodFaith Platform", className="text-center"),
+                html.H2("GoodFaith Platform", className="text-center"),
                 html.P("Sign in to access your account", className="text-center text-muted"),
                 html.Br(),
             ], width={"size": 6, "offset": 3})

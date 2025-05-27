@@ -126,7 +126,7 @@ def create_timeline_cards():
                 }
             ),
             html.Div([
-                html.I(className="fas fa-chart-pie mb-3", style={"fontSize": "36px", "color": "#5F2EEA"}),
+                html.I(className="bi bi-check2-circle mb-3", style={"fontSize": "36px", "color": "#5F2EEA"}),
                 html.H5("Financial Requirements", className="mb-3"),
                 html.P("Verify your income and expenses", className="text-muted mb-3"),
                 dbc.Button("Create new", color="primary", outline=True)
@@ -149,10 +149,10 @@ def create_timeline_cards():
                 }
             ),
             html.Div([
-                html.I(className="fas fa-chart-line mb-3", style={"fontSize": "36px", "color": "#5F2EEA"}),
+                html.I(className="bi bi-person-bounding-box mb-3", style={"fontSize": "36px", "color": "#5F2EEA"}),
                 html.H5("Single applicant check", className="mb-3"),
                 html.P("Soft credit check for group trust", className="text-muted mb-3"),
-                dbc.Button("Perform Check", color="primary", outline=True)
+                dbc.Button("Start check", href="https://goodfaith.vercel.app/risk-analysis?enterprise=1", color="primary", outline=True)
             ], className="text-center")
         ]),
         className="h-100 position-relative"
@@ -172,10 +172,10 @@ def create_timeline_cards():
                 }
             ),
             html.Div([
-                html.I(className="fas fa-credit-card mb-3", style={"fontSize": "36px", "color": "#5F2EEA"}),
+                html.I(className="bi bi-people-fill mb-3", style={"fontSize": "36px", "color": "#5F2EEA"}),
                 html.H5("Batch applicant check", className="mb-3"),
                 html.P("Configure automatic contributions", className="text-muted mb-3"),
-                dbc.Button("Add Bank Details", color="primary", outline=True)
+                dbc.Button("Batch check", color="primary", outline=True)
             ], className="text-center")
         ]),
         className="h-100 position-relative"

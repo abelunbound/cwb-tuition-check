@@ -21,7 +21,8 @@ app = dash.Dash(
     __name__,
     external_stylesheets=[
         dbc.themes.BOOTSTRAP,
-        'https://use.fontawesome.com/releases/v5.15.1/css/all.css'
+        'https://use.fontawesome.com/releases/v5.15.1/css/all.css',
+        'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css'
     ],
     suppress_callback_exceptions=True,
     use_pages=True,  # Enable pages

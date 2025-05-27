@@ -65,7 +65,7 @@
     - email	
     - country	
     - course
------ (1a.) Redirect to Mono to collect json data, store the data in database
+----- (1a.) [ignore temporarily]Redirect to Mono to collect json data, store the data in database
 
 ----- (2.) Send the 'applicant_id' and 'required_amount' value (obtain from the 'total_finance' field from 'financial_requirements' table) to the api 'https://us-central1-com-726-project.cloudfunctions.net/run-ml-model' using the json format data = {
     'applicant_id': 912345678,
